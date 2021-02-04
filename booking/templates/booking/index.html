@@ -1,0 +1,208 @@
+{% load staticfiles %}
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en-US">
+   <head>
+       <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+       <title>Η πόλη μου</title>
+
+       <!-------- CSS ------->
+       <link rel="stylesheet" href="{% static 'css/smart_city-style.css' %}">
+       <link rel="stylesheet" href="{% static 'css/components.css' %}">
+       <link rel="stylesheet" href="{% static 'css/responsee.css' %}">
+       <link rel="stylesheet" href="{% static 'owl-carousel/owl.carousel.css' %}">
+       <link rel="stylesheet" href="{% static 'owl-carousel/owl.theme.css' %}">
+
+       <!-- CUSTOM STYLE -->
+       <link rel="stylesheet" href="{% static 'css/template-style.css' %}">
+
+       <!-------- GOOGLE FONTS -------->
+       <!-- Art Logo -->
+       <link href="https://fonts.googleapis.com/css?family=Euphoria+Script" rel="stylesheet">
+       <!-- #head Title -->
+       <link href="https://fonts.googleapis.com/css?family=Calligraffitti" rel="stylesheet">
+       <!--  Main Menu (Home - Smart City - Contact) - ".top-nav a" - "template-style.css" -->
+       <link href="https://fonts.googleapis.com/css?family=Arbutus+Slab" rel="stylesheet">
+       <!-- Left Sidebar (whole) - ".smart_city-left-sidebar"  - "template-style.css" -->
+       <link href="https://fonts.googleapis.com/css?family=Bree+Serif" rel="stylesheet">
+       <!-- Title of requests(smart_city.html) and Title of requests(request_detail.html) - "template-style.css" -->
+       <link href="https://fonts.googleapis.com/css?family=Cherry+Swash" rel="stylesheet">
+       <link href="https://fonts.googleapis.com/css?family=Slabo+27px" rel="stylesheet">
+       <!-- Google glyphicons -->
+       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+       <!-------- BOOTSTRAP -------->
+       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+       <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+       <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+       <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
+       <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
+       <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
+
+       <script type="text/javascript" src="{% static 'js/jquery-1.8.3.min.js' %}"></script>
+       <script type="text/javascript" src="{% static 'js/jquery-ui.min.js' %}"></script>
+       <script type="text/javascript" src="{% static 'js/modernizr.js' %}"></script>
+       <script type="text/javascript" src="{% static 'js/responsee.js' %}"></script>
+       <!--[if lt IE 9]>
+	      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+          <script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
+       <![endif]-->
+
+       <!-- Maps Leaflet Mapbox -->
+       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
+             integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="crossorigin=""/>
+             <!-- Make sure you put this AFTER Leaflet's CSS -->
+       <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+               integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="crossorigin="">
+       </script>
+   </head>
+
+   <body class="size-1140">
+      <!-- TOP NAV WITH LOGO -->
+        <header>
+            <nav>
+                <div class="line">
+                    <div class="top-nav">
+                        <div class="logo hide-l">
+                            <a href="{% url 'home' %}">Αρχική</a>
+                        </div>
+                        <p class="nav-text"></p>
+                        <div id="services_index_menu" class="top-nav s-12 l-5">
+                            <ul class="right top-ul chevron">
+                                {% if user.is_authenticated %}
+                                    <li>
+                                        <a href="{% url 'booking_list' %}?username_authenticated_id={{ user.pk }}">Stays</a>
+                                    </li>
+                                {% else %}
+                                    <li>
+                                        <a href="{% url 'booking_list' %}?username_authenticated_id={{ user.pk }}">Stays</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <ul class="s-12 l-2">
+                            <li class="logo hide-s hide-m">
+                                <a href="{% url 'home' %}">Home</a>
+                            </li>
+                        </ul>
+                        <div class="top-nav s-12 l-5">
+                            <ul class="top-ul chevron">
+                                <li>
+                                    <a href="{% url 'home' %}?username_authenticated_id={{ user.pk }}">Contact</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="top-nav s-12 l-5">
+                            <div class="top-ul chevron">
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+
+         <!-- CAROUSEL -->
+         <div id="carousel">
+            <div id="owl-demo" class="owl-carousel owl-theme">
+               <div class="item">
+                  <img id="main_background_image" src="{% static 'img/smart_city_12.jpg' %}" alt="">
+                  <div class="carousel-text">
+                     <div class="line">
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         <!-- SECOND BLOCK -->
+         <div id="second-block">
+            <div class="line">
+               <div class="margin-bottom">
+                  <div class="margin">
+                     <article class="s-12 l-8 center">
+                        <h1 style="color:white">Η πόλη μου</h1>
+                        <p class="margin-bottom">Η εφαρμογή επιτρέπει στους πολίτες να αναφέρουν μέσω του διαδικτύου
+                                                 τοπικά προβλήματα όπως πεταμένα σκουπίδια, καμένες λάμπες ηλεκτροφωτισμού,
+                                                 σπασμένα πλακάκια στα πεζοδρόμια, παράνομες διαφημιστικές πινακίδες,
+                                                 παράνομα παρκαρισμένα οχήματα κλπ.
+						</p>
+                        <a class="button s-12 l-4 center" href="{% url 'home' %}?username_authenticated_id={{ user.pk }}">Διαβάστε περισσότερα</a>
+                     </article>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+
+         <!-- GALLERY -->
+         <div id="third-block">
+            <div class="line">
+               <h2>Πάρτε τον έλεγχο στα χέρια σας</h2>
+               <p class="subtitile">Εύκολα, γρήγορα και αποτελεσματικά
+               </p>
+               <div class="margin">
+                  <div class="s-12 m-6 l-3">
+                     <img src="{% static 'img/smart_city_11.jpg' %}" alt="Έξυπνη πόλη">
+                     <p class="subtitile">
+                     </p>
+                  </div>
+                  <div class="s-12 m-6 l-3">
+                     <img src="{% static 'img/smart_city_07.jpg' %}" alt="Έξυπνη πόλη">
+                     <p class="subtitile">
+                     </p>
+                  </div>
+                  <div class="s-12 m-6 l-3">
+                     <img src="{% static 'img/smart_city_08.jpg' %}" alt="Έξυπνη πόλη">
+                     <p class="subtitile">
+                     </p>
+                  </div>
+                  <div class="s-12 m-6 l-3">
+                     <img src="{% static 'img/smart_city_09.jpg' %}" alt="Έξυπνη πόλη">
+                     <p class="subtitile">
+                     </p>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+
+         <!-- FOOTER -->
+         <footer>
+             <div class="line">
+                 <div class="s-12 l-6">
+                     <p>Copyright &copy; 2021 Dimitris Tsiaousidis</p>
+                 </div>
+                 <div class="s-12 l-6">
+                     <p class="right"></p>
+                 </div>
+             </div>
+         </footer>
+
+         <script type="text/javascript" src="{% static 'owl-carousel/owl.carousel.js' %}"></script>
+         <script type="text/javascript">
+            jQuery(document).ready(function($) {
+              $("#owl-demo").owlCarousel({
+               slideSpeed : 300,
+               autoPlay : true,
+               navigation : false,
+               pagination : false,
+               singleItem:true
+              });
+              $("#owl-demo2").owlCarousel({
+               slideSpeed : 300,
+               autoPlay : true,
+               navigation : false,
+               pagination : true,
+               singleItem:true
+              });
+            });
+         </script>
+
+    </body>
+</html>

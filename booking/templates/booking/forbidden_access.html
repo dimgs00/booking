@@ -1,0 +1,31 @@
+{% extends 'booking/base.html' %}
+{% load staticfiles %}
+{% load widget_tweaks %}
+
+{% block header %}
+    FORBIDDEN ACCESS
+{% endblock %}
+
+{% block main_part %}
+<!-- <section> --> <!-- This is located to base.html -->
+    <!-- <div class="gallery-whole-content"> --> <!-- This is located to base.html -->
+
+        <div class="gallery-main-content">
+            <div class="container-fluid">
+
+                <div class="row">
+
+                    <div class="col-xl-3">
+                    </div>
+
+                    <div class="col-xl">
+                        <div class='forbidden_access'>
+                            <h1>Forbidden Access!</h1>
+                            <h4>If you are already registered user, wait for the administrator's approval</h4>
+                            <h5>Otherwise, call the application's support</h6>
+                        </div>
+                    </div>
+
+    </div> <!-- gallery-whole-content -->
+</section>
+{% endblock %}

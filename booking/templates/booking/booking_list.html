@@ -1,22 +1,73 @@
-<html>
-    <head>
-        <title>Django Girls blog</title>
-    </head>
-    <body>
-        <div>
-            <h1><a href="/">Django Girls Blog</a></h1>
+{% extends 'booking/base.html' %}
+{% load staticfiles %}
+{% load widget_tweaks %}
+
+
+{% block header %}
+  BOOKINGS
+{% endblock %}
+
+{% block main_part %}
+
+<!-- <section>  --> <!-- This is located to base.html -->
+    <!-- <div class="gallery-whole-content"> --> <!-- This is located to base.html -->
+        <!-- MAIN CONTENT -->
+        <div class="gallery-main-content">
+            <div class="container-fluid">
+                <div class="row">
+                    {% if booking_objects %}
+                        {% for booking_obj in booking_objects %}
+                            {% if booking_obj.photo %}
+                                <!-- col-md-4 - "gallery-style.css -->
+                                <div class="col-md-4">
+                                    <div class="thumbnail">
+                                        <a href="{% url 'booking_detail' pk=booking_obj.pk %}?username_authenticated_id={{ user.pk }}&booking_flag=1">
+                                            <img src="{{ booking_obj.photo.url }}" alt="{{ booking_obj.title }}">
+                                            <div class="caption">
+                                                <p>
+                                                    {{ booking_obj.title }}
+                                                </p>
+                                                <p>
+                                                    {{ booking_obj.published_datetime|date:"d.m.Y" }}
+                                                    &nbsp;
+                                                    &diams;
+                                                    &nbsp;
+                                                    <span class="glyphicon glyphicon-eye-open"></span>
+                                                    {{ booking_obj.counter_popularity }}
+                                                 </p>
+                                            </div>
+                                        </a>
+                                    </div>
+                                 </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-xl-4">
+                        </div>
+
+                        <div class="col-xl-4">
+                            <h1 id="no_results">No results</h1>
+                        </div>
+
+                        <div class="col-xl-4">
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
 
-        <div>
-            <p>published: 14.06.2014, 12:14</p>
-            <h2><a href="">My first post</a></h2>
-            <p>Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-        </div>
 
-        <div>
-            <p>published: 14.06.2014, 12:14</p>
-            <h2><a href="">My second post</a></h2>
-            <p>Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut f.</p>
         </div>
-    </body>
-</html>
+       </div>
+    </div> <!-- gallery-whole-content -->
+</section>
+
+{% endblock %}
+
+<script>
+  $(function () {
+    $("#datetimepicker1").datetimepicker({
+      format: 'DD/MM/YYYY HH:mm',
+    });
+  });
+</script>
