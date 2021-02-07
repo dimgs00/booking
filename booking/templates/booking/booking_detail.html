@@ -1,0 +1,61 @@
+{% extends 'booking/base.html' %}
+{% load staticfiles %}
+{% load widget_tweaks %}
+
+
+{% block header %}
+    BOOKING {{ booking_object.pk }}
+{% endblock %}
+
+{% block main_part %}
+
+<!-- <section>  --> <!-- This is located to base.html -->
+    <!-- <div class="gallery-whole-content"> --> <!-- This is located to base.html -->
+
+        <!-- MAIN CONTENT -->
+        <div class="gallery-main-content">
+            <div class="container-fluid">
+
+
+
+                <div class="row">
+                    <!-- Information -->
+                    <div class="col-xl-4">
+                    </div>
+
+                    <div class="col-xl-4">
+                        <div class="header-title">
+                            <h1 class="img-rounded"><span class="glyphicon glyphicon-bed"></span> {{ room_object.title }}</h1>
+                        </div>
+                        <div class="information">
+                            <table class="table-striped">
+                                <tbody>
+                                    {% for booking_obj in booking_objects %}
+                                        <tr>
+                                            <th><span class="glyphicon glyphicon-calendar"></span> From</th>
+                                            <td>{{ booking_obj.date_from }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th><span class="glyphicon glyphicon-calendar"></span> To</th>
+                                            <td>{{ booking_obj.date_to }}</td>
+                                        </tr>
+                                        {% if user.username == booking_obj.f_user.username or user.username == "admin" %}
+                                        <tr>
+                                            <th><span class="glyphicon glyphicon-user"></span> Guest</th>
+                                            <td>{{ booking_obj.f_user.username }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        <tr><th></th><td></td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+               </div>
+            </div>
+        </div>
+
+    </div> <!-- gallery-whole-content -->
+</section>
+
+{% endblock %}

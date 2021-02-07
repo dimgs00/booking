@@ -1,0 +1,63 @@
+{% extends 'booking/base.html' %}
+{% load staticfiles %}
+{% load widget_tweaks %}
+
+{% block header %}
+  CONTROL PANEL
+{% endblock %}
+
+{% block main_part %}
+
+<!-- <section>  --> <!-- This is located to base.html -->
+    <!-- <div class="gallery-whole-content"> --> <!-- This is located to base.html -->
+        <!-- MAIN CONTENT -->
+
+        <div class="gallery-main-content">
+            <div class="container-fluid">
+
+                <div class="row">
+
+                    <div class="col-xl-4">
+                    </div>
+
+                    <div class="col-xl-4">
+                        <div class="admin-panel">
+                            <div class="alert alert-light" role="alert">
+                                <h3><a href="{% url 'room_admin_table' %}?username_authenticated_id={{ user.pk }}&booking_flag=1">
+                                    <span class="glyphicon glyphicon-folder-open"></span> Rooms
+                                    </a>
+                                </h3>
+                            </div>
+
+                            <div class="alert alert-light" role="alert">
+                                <h3><a href="{% url 'booking_admin_table' %}?username_authenticated_id={{ user.pk }}&booking_flag=1">
+                                    <span class="glyphicon glyphicon-folder-open"></span> Bookings
+                                    </a>
+                                </h3>
+                            </div>
+
+                            <div class="alert alert-light" role="alert">
+                                <h3><a href="{% url 'user_admin_table' %}?username_authenticated_id={{ user.pk }}"><span class="glyphicon glyphicon-user"></span> Users
+                                    </a>
+                                </h3>
+                            </div>
+
+                            <div class="alert alert-light" role="alert">
+                                <h3><a href="{% url 'user_access_admin_table' %}?username_authenticated_id={{ user.pk }}"><span class="glyphicon glyphicon-lock"></span> Access Rights
+                                    </a>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- gallery-whole-content -->
+</section>
+
+{% endblock %}

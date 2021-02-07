@@ -1,0 +1,55 @@
+<!-- templates/signup.html -->
+{% extends 'booking/base.html' %}
+{% load staticfiles %}
+{% load widget_tweaks %}
+
+{% block header %}
+  SIGNUP
+{% endblock %}
+
+{% block main_part %}
+
+<!-- <section>  --> <!-- This is located to base.html -->
+    <!-- <div class="gallery-whole-content"> --> <!-- This is located to base.html -->
+
+        <div class="gallery-main-content">
+            <div class="container-fluid">
+
+                <div class="row">
+
+                    <div class="col-xl-4">
+                    </div>
+
+                    <div class="col-xl-4">
+                        <div id="jumbotron-signup-page" class="jumbotron">
+                            <form novalidate method="post">
+                                {% csrf_token %}
+                                {% for field in form.visible_fields %}
+                                    <div class="form-group">
+                                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                        {{ field|add_class:'form-control' }}
+                                        {% for error in field.errors %}
+                                            <span class="help-block">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                                <!-- {{ form.as_p }} -->
+                              <button type="submit" class="btn btn-success">
+                                  Signup
+                              </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div> <!-- gallery-whole-content -->
+</section>
+
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'booking/base.html' %}
+{% load staticfiles %}
+{% load widget_tweaks %}
+
+
+{% block header %}
+    BOOKINGS
+{% endblock %}
+
+{% block main_part %}
+
+<!-- <section>  --> <!-- This is located to base.html -->
+    <!-- <div class="gallery-whole-content"> --> <!-- This is located to base.html -->
+        <!-- MAIN CONTENT -->
+
+        <div class="gallery-main-content">
+            <div class="container-fluid">
+
+                <div class="row">
+
+                    <div class="col-xl-3">
+                    </div>
+
+                    {% if booking_objects %}
+                        <!-- Information -->
+                        <div class="col-xl">
+                            <table class="table table-striped">
+                                <a href="{% url 'booking_insert' %}?username_authenticated_id={{ user.pk }}"><button type="button" class="btn btn-success"><span class="glyphicon glyphicon-plus-sign"></span> Add Booking</button></a>
+                                <p></p>
+                                <tbody>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th id="title_admin_table">From</th>
+                                        <th>To</th>
+                                        <th>Room</th>
+                                        <th>Guest</th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+
+                                    {% for booking_obj in booking_objects %}
+                                        <tr>
+                                            <td>{{ booking_obj.pk }}</td>
+                                            <td>{{ booking_obj.date_from }}</td>
+                                            <td>{{ booking_obj.date_to }}</td>
+                                            <td>{{ booking_obj.f_room }}</td>
+                                            <td>{{ booking_obj.f_user.username }}</td>
+                                            <td><a href="{% url 'booking_update' pk=booking_obj.pk %}?username_authenticated_id={{ user.pk }}"><i class="material-icons" style="color:black">border_color</i></a></td>
+                                            <td><a href="{% url 'booking_delete' pk=booking_obj.pk admin_table_flag=1 %}?username_authenticated_id={{ user.pk }}"><i class="material-icons" style="color:red">delete_forever</i></a></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- gallery-whole-content -->
+</section>
+
+{% endblock %}

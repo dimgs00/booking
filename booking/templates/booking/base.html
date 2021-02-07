@@ -1,12 +1,19 @@
 {% load staticfiles %}
 {% load widget_tweaks %}
 
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+{{ form.media }}
+
+
 <!DOCTYPE html>
 <html lang="en-US">
    <head>
        <meta charset="UTF-8">
        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-       <title>Η πόλη μου</title>
+       <title>Lorem Ipsum Bookings</title>
 
        <!-------- CSS ------->
        <link rel="stylesheet" href="{% static 'css/smart_city-style.css' %}">
@@ -18,7 +25,7 @@
        <!-- CUSTOM STYLE -->
        <link rel="stylesheet" href="{% static 'css/template-style.css' %}">
 
-       <!-------- GOOGLE FONTS -------->
+       <!-- GOOGLE FONTS -->
        <!-- Art Logo -->
        <link href="https://fonts.googleapis.com/css?family=Euphoria+Script" rel="stylesheet">
        <!-- #head Title -->
@@ -33,32 +40,23 @@
        <!-- Google glyphicons -->
        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-       <!-------- BOOTSTRAP -------->
+
+       <!-- BOOTSTRAP -->
        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-       <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
-       <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
-       <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
+
+       <!-- For Bootstrap Dropdown Menu -->
+       <script src="https://netdna.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
 
        <script type="text/javascript" src="{% static 'js/jquery-1.8.3.min.js' %}"></script>
        <script type="text/javascript" src="{% static 'js/jquery-ui.min.js' %}"></script>
        <script type="text/javascript" src="{% static 'js/modernizr.js' %}"></script>
        <script type="text/javascript" src="{% static 'js/responsee.js' %}"></script>
-       <!--[if lt IE 9]>
-	      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-          <script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
-       <![endif]-->
 
-       <!-- Maps Leaflet Mapbox -->
-       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
-             integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="crossorigin=""/>
-             <!-- Make sure you put this AFTER Leaflet's CSS -->
-       <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
-               integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="crossorigin="">
-       </script>
    </head>
 
    <body class="size-1140">
@@ -74,7 +72,7 @@
 
             <!-- Horizontal Menu -->
                 <div class="col-md-6 infobar">
-                        <a class="nav-link" id="home_page_link" href="{% url 'home' %}?username_authenticated_id={{ user.pk }}"><span class="glyphicon glyphicon-home"></span> Home</a>
+                        <a class="nav-link" id="home_page_link" href="{% url 'booking_list' %}?username_authenticated_id={{ user.pk }}"><span class="glyphicon glyphicon-home"></span> Home</a>
                 </div>
 
                 <div class="col-md-6 infobar2">
@@ -88,7 +86,7 @@
                         {% else %}
                                 <span class="glyphicon glyphicon-user"></span>
                                 <a id="login-btn" class="btn btn-success btn-lg" role="button" href="{% url 'login' %}" style="color:white">Login </a>
-                                New user;<a href="{% url 'signup' %}"><button type="button" class="btn btn-link">Signup</button></a>
+                                <a href="{% url 'signup' %}"><button type="button" class="btn btn-link">Signup</button></a>
                         {% endif %}
                         <!-- Control panel button -->
                         {% if user_access_object.f_access.title == 'Administrator' %}
@@ -107,143 +105,16 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNavDropdown">
                     <ul class="navbar-nav">
-                        {% if user_access_object.f_access.title == 'Administrator' and booking_flag == 1 %}
-                        <div id="accordion">
-                            <li>
-                                <div class="card">
-                                    <!-- Collapse accordion #6 -->
-                                    <div class="card-header" id="headingSix">
-                                      <p class="mb-0">
-                                        <a class="btn btn-link" data-toggle="collapse" data-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
-                                            <span class="glyphicon glyphicon-filter"></span> Booking Filters <span class="glyphicon glyphicon-chevron-down"></span>
-                                        </a>
-                                      </p>
-                                    </div>
-                                    <div id="collapseSix" class="collapse" aria-labelledby="headingSix" data-parent="#accordion">
-                                        <div class="card-body">
-                                            <form method="get" action="{% url 'booking_list' %}">
-                                                <div class="form-group">
-                                                    <table>
-                                                        <tbody>
-                                                            <a href=".?username_authenticated_id={{ user.pk }}"><p>Reset</p></a>
-                                                            <button type="submit" class="btn btn-primary">
-                                                                <span class="glyphicon glyphicon-search"></span>
-                                                                 Search
-                                                            </button>
-                                                            <p></p>
-                                                            <tr>
-                                                                <td>
-                                                                    <span class="glyphicon glyphicon-tag"></span> Title
-                                                                    {{ request_filter.form.title|add_class:'form-control' }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>
-                                                                    <span class="glyphicon glyphicon-th-large"></span> Category
-                                                                    <div class="panel panel-default">
-                                                                        <div class="panel-body">
-                                                                            <div class="panel-checkbox-body">
-                                                                                {% for choice in request_filter.form.f_category %}
-                                                                                    <div class="checkbox">
-                                                                                        <label class="custom-control-label">
-                                                                                            {{ choice.tag }} {{ choice.choice_label.title }}
-                                                                                        </label>
-                                                                                    </div>
-                                                                                {% endfor %}
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                                <tr>
-                                                                    <td>
-                                                                        <!-- Complex filters - "Published" -->
-                                                                        <span class="glyphicon glyphicon-calendar"></span> Published (YYYY-MM-DD)
-                                                                        <div class="complex-filters-input">
-                                                                            Από
-                                                                            {{ request_filter.form.published_datetime_gte|add_class:'form-control' }}
-                                                                            <!-- <label>{{ request_filter.form.published_datetime_gte }}</label> -->
-                                                                            έως
-                                                                            {{ request_filter.form.published_datetime_lte|add_class:'form-control' }}
-                                                                            <!-- <label>{{ request_filter.form.published_datetime_lte }}</label> -->
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                        </tbody>
-                                                    </table>
-                                                    <input type="hidden" name="complex_filters_status" value="1">
-                                                    <button type="submit" class="btn btn-primary">
-                                                        <span class="glyphicon glyphicon-search"></span>
-                                                         Search
-                                                    </button>
-                                                </div> <!-- form-group -->
-                                                <input type="hidden" name="username_authenticated_id" value="{{ user.pk }}" />
-                                                <a href=".?username_authenticated_id={{ user.pk }}"><p>Reset</p></a>
-                                            </form>
-                                        </div> <!-- card-body -->
-                                    </div> <!-- collapse -->
-                                </div> <!-- card -->
-                            </li>
-                        </div>
-                        {% endif %}
 
-                        <div id="accordion">
-                            <li class="nav-item">
-                                <!-- Collapse accordion #1 -->
-                                <div class="card">
-                                    <div class="card-header" id="headingOne">
-                                        <p class="mb-0">
-                                            <a class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                                <span class="glyphicon glyphicon-folder-open"> Stays </span> <span class="glyphicon glyphicon-chevron-down"> </span>
-                                            </a>
-                                        </p>
-                                    </div>
-                                    <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                                        <div class="card-body">
-                                            <form class="form-inline" type="get" action="{% url 'booking_list' %}">
-                                                <input class="form-control mr-sm-2" type="search" name="txt" value="" placeholder="" aria-label="Search">
-                                                <button class="btn btn-outline-secondary" type="submit"><span class="glyphicon glyphicon-search"></span></button>
-                                                <input type="hidden" name="username_authenticated_id" value="{{ user.pk }}">
-                                                <input type="hidden" name="booking_flag" value="1">
-                                            </form>
-
-                                            {% if user.is_authenticated %}
-                                                <a class="nav-link" href="{% url 'booking_list' %}?username_authenticated_id={{ user.pk }}&booking_flag=1"><span class="glyphicon glyphicon-th-list"></span> All</a>
-                                            {% else %}
-                                                <a class="nav-link" href="{% url 'booking_list' %}?booking_flag=1"><span class="glyphicon glyphicon-th-list"></span> All</a>
-                                            {% endif %}
-                                            {% if user_access_object.f_access.title == 'Administrator' or  user_access_object.f_access.title == 'User' %}
-                                                <a class="nav-link" href="{% url 'booking_insert' %}?username_authenticated_id={{ user.pk }}&booking_flag=1"><span class="glyphicon glyphicon-plus-sign"></span> Insert</a>
-                                            {% endif %}
-                                            {% if user_access_object.f_access.title == 'Administrator' or  user_access_object.f_access.title == 'User' %}
-                                                <a class="nav-link" href="{% url 'my_booking_list' %}?username_authenticated_id={{ user.pk }}&booking_flag=1"><span class="glyphicon glyphicon-thumbs-up"></span> My bookings</a>
-                                            {% endif %}
-
-
-                                            {% if user_access_object.f_access.title == 'Administrator' or user_access_object.f_access.title == 'User' %}
-                                            <!-- Dropdown menu "Categories" -->
-                                                <div class="dropdown">
-                                                    <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                        <span class="glyphicon glyphicon-th-large"></span> Category
-                                                    </button>
-                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                        {% for category in categories_distinct %}
-                                                        <a class="dropdown-item" href="{% url 'booking_list' %}?category_id={{ category.pk }}&username_authenticated_id={{ user.pk }}&booking_flag=1">{{ category.title }}</a>
-                                                        {% endfor %}
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-
-                                        </div> <!-- card body -->
-                                    </div> <!-- collapse -->
-                                </div> <!-- card -->
-                            </li>
-                        </div>
 
                     </ul>
 
                 </div> <!-- collapse -->
             </nav> <!-- expand -->
+
+
+
+
 
             <!-- Whole content --> <!-- This tag closes to other block .html files -->
             <div class="gallery-whole-content">

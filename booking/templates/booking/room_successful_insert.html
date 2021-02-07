@@ -1,0 +1,40 @@
+{% extends 'booking/base.html' %}
+{% load staticfiles %}
+{% load widget_tweaks %}
+
+{% block header %}
+    ROOMS
+{% endblock %}
+
+{% block main_part %}
+<!-- <section> --> <!-- This is located to base.html -->
+    <!-- <div class="gallery-whole-content"> --> <!-- This is located to base.html -->
+
+        <div class="gallery-main-content">
+            <div class="container-fluid">
+
+                <div class="row">
+
+                    <div class="col-xl-4">
+                    </div>
+
+                    <div class="col-xl">
+                        <div class='request_successful_insert'>
+                            <h1>Successful Entry!</h1>
+                            {% if user_access_object.f_access.title == 'Administrator' %}
+                                <a href="{% url 'room_admin_table' %}?username_authenticated_id={{ user.pk }}&booking_flag=1">
+                            {% else %}
+                                <a href="{% url 'room_list' %}?username_authenticated_id={{ user.pk }}&booking_flag=1">
+                            {% endif %}
+                                <h6>Return to Rooms</h6>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- gallery-whole-content -->
+</section>
+{% endblock %}

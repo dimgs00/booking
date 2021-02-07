@@ -1,0 +1,36 @@
+{% extends 'booking/base.html' %}
+{% load staticfiles %}
+{% load widget_tweaks %}
+
+{% block header %}
+    ACCESS RIGHTS
+{% endblock %}
+
+{% block main_part %}
+<!-- <section> --> <!-- This is located to base.html -->
+    <!-- <div class="gallery-whole-content"> --> <!-- This is located to base.html -->
+
+        <div class="gallery-main-content">
+            <div class="container-fluid">
+
+                <div class="row">
+
+                    <div class="col-xl-4">
+                    </div>
+
+                    <div class="col-xl">
+                        <div class='user_access_successful_insert'>
+                            <h1>Successful Entry!</h1>
+                            <a href="{% url 'user_access_admin_table' %}?username_authenticated_id={{ user.pk }}">
+                                <h6>Return to Access Control</h6>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- gallery-whole-content -->
+</section>
+{% endblock %}

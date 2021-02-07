@@ -1,18 +1,79 @@
 from .models import *
-from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import MultipleObjectsReturned
-from .filters import BookingFilter
-
+from .forms import BookingForm, UserAccessForm, RoomForm
+from django.shortcuts import render, get_object_or_404 # redirect,
 
 
 def home(request):
     return render(request, 'booking/index.html', {})
 
-# BOOKING LIST
+
 def booking_list(request, null=None):
+    room_id = request.GET.get('room_id', '')
+    user_authenticated = request.user.is_authenticated
+    user_authenticated_pk = request.user.pk
+
+    if user_authenticated:
+        try:
+            user_access_object = UserAccess.objects.get(f_user=user_authenticated_pk)
+        except (ObjectDoesNotExist, MultipleObjectsReturned) as e:
+            print("DoesNotExist")
+            return render(request, 'booking/forbidden_access.html')
+    else:
+        print("empty")
+
+
+    rooms_list = []
+    booking_dict = {}
+    rooms_distinct = Room.objects.all().distinct().order_by('title')
+    i = 0
+    for room in rooms_distinct:
+        rooms_list.append(room.title)
+        booking_objects_by_room_id = Booking.objects.filter(f_room = room.id)
+        booking_dict[i] = booking_objects_by_room_id
+        i += 1
+
+    return render(request, 'booking/booking_list.html', locals())
+
+
+def admin_panel(request):
     username_authenticated_id = request.GET.get('username_authenticated_id', '')
-    # Checking if each id is valid or not
+
+    try:
+        username_authenticated_id = int(username_authenticated_id)
+    except:
+        username_authenticated_id = False
+
+    if username_authenticated_id != False:
+        user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
+    else:
+        print("empty")
+
+    return render(request, 'booking/admin_panel.html', locals())
+
+
+def user_admin_table(request):
+    username_authenticated_id = request.GET.get('username_authenticated_id', '')
+    try:
+        username_authenticated_id = int(username_authenticated_id)
+    except:
+        username_authenticated_id = False
+
+    if username_authenticated_id != False:
+        user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
+    else:
+        print("empty")
+
+    user_objects = get_user_model().objects.all().order_by('username')
+    booking_list = Booking.objects.all()
+
+    return render(request, 'booking/user_admin_table.html', locals())
+
+
+def user_access_admin_table(request):
+    username_authenticated_id = request.GET.get('username_authenticated_id', '')
+
     try:
         username_authenticated_id = int(username_authenticated_id)
     except:
@@ -23,260 +84,60 @@ def booking_list(request, null=None):
             user_access_object = UserAccess.objects.get(f_user=username_authenticated_id)
         except (ObjectDoesNotExist, MultipleObjectsReturned) as e:
             print("DoesNotExist")
-            return render(request, 'booking/forbidden_access.html')
+            return render(request, 'booking/forbidden_access.html')    ###############################################################
+
+    user_access_objects = UserAccess.objects.all().order_by('f_user')
+    booking_list = Booking.objects.all()
+
+    return render(request, 'booking/user_access_admin_table.html', locals())
+
+
+def booking_insert(request):
+    username_authenticated_id = request.GET.get('username_authenticated_id', '')
+
+    try:
+        username_authenticated_id = int(username_authenticated_id)
+    except:
+        username_authenticated_id = False
+
+    if username_authenticated_id != False:
+        user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
     else:
         print("empty")
 
     ###################################################################
 
     booking_flag = request.GET.get('booking_flag', '')
-    # Checking if each booking_flag is 1 or not
     try:
         booking_flag = int(booking_flag)
     except:
         booking_flag = 1
 
-    ###################################################################
+    booking_objects = Booking.objects.all()
 
-    # Get IDs and text(search field) from template "booking_list.html"
-    txt = request.GET.get('txt', '') # Search text field
-    complex_filters_status = request.GET.get('complex_filters_status', '')
-    category_id = request.GET.get('category_id', '')
-
-    # Checking if each id is valid or not
-    try:
-        complex_filters_status = int(complex_filters_status)
-    except:
-        complex_filters_status = 'empty'
-    try:
-        category_id = int(category_id)
-    except:
-        category_id = False
-
-    ########################################################################
-
-    # Checking if an ID is valid or not
-    if category_id != False:
-        booking_objects = Booking.objects.filter(f_category = category_id)
-    else:
-        if txt == '':
-            booking_objects = Booking.objects.all().order_by('-published_datetime')
-        else:
-            booking_objects = Booking.objects.filter(Q(title__icontains=txt) | Q(description__icontains=txt) |
-                                                     Q(f_category__title__icontains=txt)).order_by('-published_datetime')
-    #################### DISTINCT OBJECTS ####################
-    #Distinct categories
-    categories_distinct = Category.objects.all().distinct().order_by('title')
-
-    #################### FILTERS.py ####################
-    ########## Booking Filter by "filters.py" ##########
     booking_list = Booking.objects.all()
-    booking_filter = BookingFilter(request.GET, queryset=booking_list)
-
-    ########## COMPLEX filters ("filters.py") vs STANDARD filters #########
-    if complex_filters_status != 'empty':
-        booking_objects = booking_filter.qs
-        complex_filters_status = 0
-
-    # Final RETURN
-    return render(request, 'booking/booking_list.html', locals())
-
-
-def admin_panel(request):
-    username_authenticated_id = request.GET.get('username_authenticated_id', '')
-    # Checking if each id is valid or not
-    try:
-        username_authenticated_id = int(username_authenticated_id)
-    except:
-        username_authenticated_id = False
-
-    if username_authenticated_id != False:
-        user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
-        # user_access_object = UserAccess.objects.filter(f_user=username_authenticated_id)
-    else:
-        print("empty")
-
-    ###################################################################
-
-    ##### Complex Filters #####
-    complex_filters_status = request.GET.get('complex_filters_status', '')
-
-    # Checking if each id is valid or not
-    try:
-        complex_filters_status = int(complex_filters_status)
-    except:
-        complex_filters_status = 'empty'
-
-    #################### FILTERS.py ####################
-    ########## Request Filter by "filters.py" ##########
-    request_list = Request.objects.all()
-    request_filter = RequestFilter(request.GET, queryset=request_list)
-
-    ########## COMPLEX filters ("filters.py") vs STANDARD filters #########
-    if complex_filters_status != 'empty':
-        request_objects = request_filter.qs
-        complex_filters_status = 0
-
-    #################### DISTINCT OBJECTS ####################
-    #Distinct categories
-    categories_distinct = Category.objects.all().distinct().order_by('title')
-    stages_distinct = Stage.objects.all().distinct()
-    priorities_distinct = Priority.objects.all()
-
-    return render(request, 'request_app/admin_panel.html', locals())
-
-
-
-def booking_insert(request):
-    username_authenticated_id = request.GET.get('username_authenticated_id', '')
-    # Checking if each id is valid or not
-    try:
-        username_authenticated_id = int(username_authenticated_id)
-    except:
-        username_authenticated_id = False
-
-    if username_authenticated_id != False:
-        user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
-        # user_access_object = UserAccess.objects.filter(f_user=username_authenticated_id)
-    else:
-        print("empty")
-
-    ###################################################################
-
-    request_flag = request.GET.get('request_flag', '')
-    # Checking if each request_flag is 1 or not
-    try:
-        request_flag = int(request_flag)
-    except:
-        request_flag = 1
-
-    ####################################################################
-    request_objects = Request.objects.all()
-
-    ##### Complex Filters #####
-    complex_filters_status = request.GET.get('complex_filters_status', '')
-
-    # Checking if each id is valid or not
-    try:
-        complex_filters_status = int(complex_filters_status)
-    except:
-        complex_filters_status = 'empty'
-
-    #################### FILTERS.py ####################
-    ########## Request Filter by "filters.py" ##########
-    request_list = Request.objects.all()
-    request_filter = RequestFilter(request.GET, queryset=request_list)
-
-    ########## COMPLEX filters ("filters.py") vs STANDARD filters #########
-    if complex_filters_status != 'empty':
-        request_objects = request_filter.qs
-        complex_filters_status = 0
-
-    #################### DISTINCT OBJECTS ####################
-    #Distinct categories
-    categories_distinct = Category.objects.all().distinct().order_by('title')
-    stages_distinct = Stage.objects.all().distinct()
-    priorities_distinct = Priority.objects.all()
-
 
     # Submit Form
     if request.method == 'GET':
         error_photo = False
-        form = RequestForm()
+        form = BookingForm()
     else:
-        form = RequestForm(request.POST, request.FILES)
+        form = BookingForm(request.POST, request.FILES)
         if form.is_valid():
-            title = form.cleaned_data['title']
-            description = form.cleaned_data['description']
-            coordinates = form.cleaned_data['coordinates']
-            photo = form.cleaned_data['photo']
-            # counter_popularity = 1
-            f_priority = form.cleaned_data['f_priority']
-            # f_stage = form.cleaned_data['f_stage']
-            f_stage = get_object_or_404(Stage, pk=1)
-            f_category = form.cleaned_data['f_category']
-            username_current = request.POST.get('username_current')
-            user_object = get_object_or_404(get_user_model(), username=request.user.username)
-            Request.objects.create(
-                title = title,
-                description = description,
-                coordinates = coordinates,
-                photo = photo,
-                # counter_popularity = counter_popularity,
-                f_priority = f_priority,
-                f_stage = f_stage,
-                f_category = f_category,
-                f_user = user_object
+            date_from = form.cleaned_data['date_from']
+            date_to = form.cleaned_data['date_to']
+            f_room = form.cleaned_data['f_room']
+            f_user = form.cleaned_data['f_user']
+            Booking.objects.create(
+                date_from = date_from,
+                date_to = date_to,
+                f_room = f_room,
+                f_user = f_user
             )
-            error_photo = False
-            # return HttpResponseRedirect(reverse('request_list'))
-            return render(request, 'request_app/request_successful_insert.html', locals())
-        error_photo = True
-    return
+            return render(request, 'booking/booking_successful_insert.html', locals())
+    return render(request, 'booking/booking_insert.html', locals())
 
 
-# MY BOOKING LIST
-def my_booking_list(request, null=None):
-    username_authenticated_id = request.GET.get('username_authenticated_id', '')
-    # Checking if each id is valid or not
-    try:
-        username_authenticated_id = int(username_authenticated_id)
-    except:
-        username_authenticated_id = False
-
-    if username_authenticated_id != False:
-        # user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
-        try:
-            user_access_object = UserAccess.objects.get(f_user=username_authenticated_id)
-            # user_access_object = UserAccess.objects.filter(f_user=username_authenticated_id)
-        except UserAccess.DoesNotExist:
-            print("DoesNotExist")
-    else:
-        print("empty")
-
-    ###################################################################
-
-    request_flag = request.GET.get('request_flag', '')
-    # Checking if each request_flag is 1 or not
-    try:
-        request_flag = int(request_flag)
-    except:
-        request_flag = 1
-
-    ###################################################################
-    my_request_objects = Request.objects.filter(f_user=username_authenticated_id).order_by('-published_datetime')
-
-
-    ##### Complex Filters #####
-    complex_filters_status = request.GET.get('complex_filters_status', '')
-
-    # Checking if each id is valid or not
-    try:
-        complex_filters_status = int(complex_filters_status)
-    except:
-        complex_filters_status = 'empty'
-
-    #################### FILTERS.py ####################
-    ########## Request Filter by "filters.py" ##########
-    request_list = Request.objects.all().order_by('-published_datetime')
-    request_filter = RequestFilter(request.GET, queryset=request_list)
-
-    ########## COMPLEX filters ("filters.py") vs STANDARD filters #########
-    if complex_filters_status != 'empty':
-        request_objects = request_filter.qs
-        complex_filters_status = 0
-
-    #################### DISTINCT OBJECTS ####################
-    #Distinct categories
-    categories_distinct = Category.objects.all().distinct().order_by('title')
-    stages_distinct = Stage.objects.all().distinct()
-    priorities_distinct = Priority.objects.all()
-
-    # Final RETURN
-    return render(request, 'request_app/my_request_list.html', locals())
-
-
-# BOOKINGS DETAILS
 def booking_detail(request, pk):
     username_authenticated_id = request.GET.get('username_authenticated_id', '')
 
@@ -287,86 +148,399 @@ def booking_detail(request, pk):
 
     if username_authenticated_id != False:
         user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
-        # user_access_object = UserAccess.objects.filter(f_user=username_authenticated_id)
     else:
         print("empty")
 
-    ###################################################################
+
+    booking_flag = request.GET.get('booking_flag', '')
+    try:
+        booking_flag = int(booking_flag)
+    except:
+        booking_flag = 1
+
+    room_object = get_object_or_404(Room, pk=pk)
+    booking_objects = Booking.objects.filter(f_room=pk)
+    booking_list = Booking.objects.all()
+
+    return render(request, 'booking/booking_detail.html', locals())
+
+
+def booking_update(request, pk):
+    username_authenticated_id = request.GET.get('username_authenticated_id', '')
+    try:
+        username_authenticated_id = int(username_authenticated_id)
+    except:
+        username_authenticated_id = False
+
+    if username_authenticated_id != False:
+        user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
+    else:
+        print("empty")
+
 
     request_flag = request.GET.get('request_flag', '')
-    # Checking if each request_flag is 1 or not
     try:
         request_flag = int(request_flag)
     except:
         request_flag = 1
 
-    #####################################################################
+    booking_list = Booking.objects.all()
+    booking_obj = get_object_or_404(Booking, pk=pk)
 
-    request_object = get_object_or_404(Request, pk=pk)
-
-    ##### Complex Filters #####
-    complex_filters_status = request.GET.get('complex_filters_status', '')
-
-    # Checking if each id is valid or not
-    try:
-        complex_filters_status = int(complex_filters_status)
-    except:
-        complex_filters_status = 'empty'
-
-    try:
-        request_comment_object = Comment.objects.filter(f_request=request_object.pk)
-        go = True
-        # go = int(request_comment_object.pk)
-    except Comment.DoesNotExist:
-        request_comment_object = 0
-        go = False
-
-    # CommentForm
+    # Submit Form
     if request.method == "POST":
-        form = CommentForm(request.POST, request.FILES)
+        form = BookingForm(request.POST, request.FILES, instance=booking_obj)
         if form.is_valid():
-            username_authenticated_id_post = request.POST.get("username_authenticated_id_post")
-            # Checking if each id is valid or not
-            # print("id=", username_authenticated_id_post)
-
-            try:
-                username_authenticated_id_post = int(username_authenticated_id_post)
-            except:
-                username_authenticated_id_post = False
-
-            if username_authenticated_id_post != False:
-                user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id_post)
-                # user_access_object = UserAccess.objects.filter(f_user=username_authenticated_id)
-            else:
-                print("empty")
-
-            #################################################################
-
-            username_current = request.POST.get("username_current")
-            user_object = get_object_or_404(get_user_model(), username=username_current)
-            comments_current = form.cleaned_data['comments']
-            Comment.objects.create(comments=comments_current, f_request=request_object, f_user=user_object)
-            form = CommentForm()
-            return render(request, 'request_app/request_detail.html', locals())
+            booking_obj.save()
+            return render(request, 'booking/booking_successful_updating.html', locals())
     else:
-        form = CommentForm()
+        form = BookingForm(instance=booking_obj)
 
-    #################### DISTINCT OBJECTS ####################
-    #Distinct categories
-    categories_distinct = Category.objects.all().distinct().order_by('title')
-    stages_distinct = Stage.objects.all().distinct()
-    priorities_distinct = Priority.objects.all()
+    return render(request, 'booking/booking_update.html', locals())
 
-    #################### FILTERS.py ####################
-    ########## Request Filter by "filters.py" ##########
-    request_list = Request.objects.all()
-    request_filter = RequestFilter(request.GET, queryset=request_list)
 
-    ########## COMPLEX filters ("filters.py") vs STANDARD filters #########
-    if complex_filters_status != 'empty':
-        request_objects = request_filter.qs
-        complex_filters_status = 0
+def booking_admin_table(request):
+    username_authenticated_id = request.GET.get('username_authenticated_id', '')
+    try:
+        username_authenticated_id = int(username_authenticated_id)
+    except:
+        username_authenticated_id = False
 
-    request_object.counter_popularity = request_object.counter_popularity + 1
-    request_object.save()
-    return render(request, 'request_app/request_detail.html', locals())
+    if username_authenticated_id != False:
+        user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
+    else:
+        print("empty")
+
+
+    booking_flag = request.GET.get('booking_flag', '')
+    try:
+        booking_flag = int(booking_flag)
+    except:
+        booking_flag = 1
+
+
+    booking_objects = Booking.objects.all().order_by('-date_from')
+    booking_list = Booking.objects.all()
+
+    return render(request, 'booking/booking_admin_table.html', locals())
+
+
+def booking_delete(request, pk, admin_table_flag):
+    username_authenticated_id = request.GET.get('username_authenticated_id', '')
+    booking_flag = 1
+    try:
+        username_authenticated_id = int(username_authenticated_id)
+    except:
+        username_authenticated_id = False
+
+    if username_authenticated_id != False:
+        user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
+    else:
+        print("empty")
+
+
+    booking_flag = request.GET.get('booking_flag', '')
+    try:
+        booking_flag = int(booking_flag)
+    except:
+        booking_flag = 1
+
+
+    try:
+        admin_table_flag = int(admin_table_flag)
+    except:
+        admin_table_flag = False
+
+
+    booking_objects = Booking.objects.all()
+    if admin_table_flag != False:
+        Booking.objects.get(pk=pk).delete()
+        return render(request, 'booking/booking_admin_table.html', locals())
+    else:
+        Booking.objects.get(pk=pk).delete()
+        return render(request, 'booking/booking_list.html', locals())
+
+    return render(request, 'booking/booking_list.html', locals())
+
+
+def user_access_insert(request):
+    username_authenticated_id = request.GET.get('username_authenticated_id', '')
+    try:
+        username_authenticated_id = int(username_authenticated_id)
+    except:
+        username_authenticated_id = False
+
+    if username_authenticated_id != False:
+        user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
+    else:
+        print("empty")
+
+    booking_list = Booking.objects.all()
+
+    # Submit Form
+    if request.method == 'GET':
+        form = UserAccessForm()
+    else:
+        form = UserAccessForm(request.POST)
+        if form.is_valid():
+            f_user = form.cleaned_data['f_user']
+            f_access = form.cleaned_data['f_access']
+
+            str_f_user = str(f_user)
+            if(str_f_user != "admin"):
+                UserAccess.objects.create(
+                    f_user = f_user,
+                    f_access = f_access,
+                )
+                return render(request, 'booking/user_access_successful_insert.html', locals())
+            else:
+                user_access_object = get_object_or_404(UserAccess, f_user=1)
+                return render(request, 'booking/forbidden_insert_access_privileges.html', locals())
+
+    return render(request, 'booking/user_access_insert.html', locals())
+
+
+def user_access_update(request, pk):
+    username_authenticated_id = request.GET.get('username_authenticated_id', '')
+    try:
+        username_authenticated_id = int(username_authenticated_id)
+    except:
+        username_authenticated_id = False
+
+    if username_authenticated_id != False:
+        user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
+    else:
+        print("empty")
+
+    user_access_object = get_object_or_404(UserAccess, pk=pk)
+    booking_list = Booking.objects.all()
+
+    # Submit Form
+    if request.method == "POST":
+        form = UserAccessForm(request.POST, instance=user_access_object)
+        if form.is_valid():
+            f_user = form.cleaned_data['f_user']
+            str_f_user = str(f_user)
+            if(str_f_user != "admin"):
+                user_access_object.save()
+                return render(request, 'booking/user_access_successful_updating.html', locals())
+            else:
+                user_access_object = UserAccess.objects.get(f_user=1)
+                return render(request, 'booking/forbidden_update_access_privileges.html', locals())
+    else:
+        form = UserAccessForm(instance=user_access_object)
+
+    return render(request, 'booking/user_access_update.html', locals())
+
+
+def user_access_delete(request, pk, admin_table_flag):
+    username_authenticated_id = request.GET.get('username_authenticated_id', '')
+    try:
+        username_authenticated_id = int(username_authenticated_id)
+    except:
+        username_authenticated_id = False
+
+    if username_authenticated_id != False:
+        try:
+            user_access_object = UserAccess.objects.get(f_user=username_authenticated_id)
+        except MultipleObjectsReturned:
+            print("MultipleObjectsReturned")
+    else:
+        print("empty")
+
+
+    try:
+        admin_table_flag = int(admin_table_flag)
+    except:
+        admin_table_flag = False
+
+    user_access_object = UserAccess.objects.get(f_user=1)
+    user_access_objects = UserAccess.objects.all()
+    UserAccess.objects.get(pk=pk).delete()
+
+    return render(request, 'booking/user_access_admin_table.html', locals())
+
+
+def room_admin_table(request):
+    username_authenticated_id = request.GET.get('username_authenticated_id', '')
+    try:
+        username_authenticated_id = int(username_authenticated_id)
+    except:
+        username_authenticated_id = False
+
+    if username_authenticated_id != False:
+        user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
+    else:
+        print("empty")
+
+    room_flag = request.GET.get('room_flag', '')
+    try:
+        room_flag = int(room_flag)
+    except:
+        room_flag = 1
+
+    room_objects = Room.objects.all()
+    room_list = Room.objects.all()
+
+    return render(request, 'booking/room_admin_table.html', locals())
+
+
+def room_insert(request):
+    username_authenticated_id = request.GET.get('username_authenticated_id', '')
+    try:
+        username_authenticated_id = int(username_authenticated_id)
+    except:
+        username_authenticated_id = False
+
+    if username_authenticated_id != False:
+        user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
+    else:
+        print("empty")
+
+    room_objects = Room.objects.all()
+    room_list = Room.objects.all()
+
+    # Submit Form
+    if request.method == 'GET':
+        form = RoomForm()
+    else:
+        form = RoomForm(request.POST, request.FILES)
+        if form.is_valid():
+            title = form.cleaned_data['title']
+            Room.objects.create(
+                title = title,
+            )
+            return render(request, 'booking/room_successful_insert.html', locals())
+    return render(request, 'booking/room_insert.html', locals())
+
+
+def room_update(request, pk):
+    username_authenticated_id = request.GET.get('username_authenticated_id', '')
+    try:
+        username_authenticated_id = int(username_authenticated_id)
+    except:
+        username_authenticated_id = False
+
+    if username_authenticated_id != False:
+        user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
+    else:
+        print("empty")
+
+    room_flag = request.GET.get('room_flag', '')
+    try:
+        room_flag = int(room_flag)
+    except:
+        room_flag = 1
+
+    room_list = Room.objects.all()
+    room_obj = get_object_or_404(Room, pk=pk)
+
+    # Submit Form
+    if request.method == "POST":
+        form = RoomForm(request.POST, request.FILES, instance=room_obj)
+        if form.is_valid():
+            room_obj.save()
+            return render(request, 'booking/room_successful_updating.html', locals())
+    else:
+        form = RoomForm(instance=room_obj)
+
+    return render(request, 'booking/room_update.html', locals())
+
+
+def room_delete(request, pk, admin_table_flag):
+    username_authenticated_id = request.GET.get('username_authenticated_id', '')
+    room_flag = 1
+    try:
+        username_authenticated_id = int(username_authenticated_id)
+    except:
+        username_authenticated_id = False
+
+    if username_authenticated_id != False:
+        user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
+    else:
+        print("empty")
+
+    room_flag = request.GET.get('room_flag', '')
+    try:
+        room_flag = int(room_flag)
+    except:
+        room_flag = 1
+
+    try:
+        admin_table_flag = int(admin_table_flag)
+    except:
+        admin_table_flag = False
+
+
+    room_objects = Room.objects.all()
+    if admin_table_flag != False:
+        Room.objects.get(pk=pk).delete()
+        return render(request, 'booking/room_admin_table.html', locals())
+    else:
+        Room.objects.get(pk=pk).delete()
+        return render(request, 'booking/room_list.html', locals())
+
+    return render(request, 'booking/room_list.html', locals())
+
+
+def room_delete(request, pk, admin_table_flag):
+    username_authenticated_id = request.GET.get('username_authenticated_id', '')
+    room_flag = 1
+    try:
+        username_authenticated_id = int(username_authenticated_id)
+    except:
+        username_authenticated_id = False
+
+    if username_authenticated_id != False:
+        user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
+    else:
+        print("empty")
+
+    room_flag = request.GET.get('room_flag', '')
+    try:
+        room_flag = int(room_flag)
+    except:
+        room_flag = 1
+
+    try:
+        admin_table_flag = int(admin_table_flag)
+    except:
+        admin_table_flag = False
+
+
+    room_objects = Room.objects.all()
+    Room.objects.get(pk=pk).delete()
+
+    return render(request, 'booking/room_admin_table.html', locals())
+
+
+def room_update(request, pk):
+    username_authenticated_id = request.GET.get('username_authenticated_id', '')
+    try:
+        username_authenticated_id = int(username_authenticated_id)
+    except:
+        username_authenticated_id = False
+
+    if username_authenticated_id != False:
+        user_access_object = get_object_or_404(UserAccess, f_user=username_authenticated_id)
+    else:
+        print("empty")
+
+    room_flag = request.GET.get('room_flag', '')
+    try:
+        room_flag = int(room_flag)
+    except:
+        room_flag = 1
+
+    room_list = Room.objects.all()
+    room_obj = get_object_or_404(Room, pk=pk)
+
+    # Submit Form
+    if request.method == "POST":
+        form = RoomForm(request.POST, request.FILES, instance=room_obj)
+        if form.is_valid():
+            room_obj.save()
+            return render(request, 'booking/room_successful_updating.html', locals())
+    else:
+        form = RoomForm(instance=room_obj)
+    return render(request, 'booking/room_update.html', locals())

@@ -1,0 +1,65 @@
+{% extends 'booking/base.html' %}
+{% load staticfiles %}
+{% load widget_tweaks %}
+
+{% block header %}
+    USERS
+{% endblock %}
+
+{% block main_part %}
+
+<!-- <section>  --> <!-- This is located to base.html -->
+    <!-- <div class="gallery-whole-content"> --> <!-- This is located to base.html -->
+        <!-- MAIN CONTENT -->
+
+        <div class="gallery-main-content">
+            <div class="container-fluid">
+
+                <div class="row">
+
+                    <div class="col-xl-4">
+                    </div>
+
+                    {% if user_objects %}
+                        <!-- Information -->
+                        <div class="col-xl">
+                            <div class="request-admin-table">
+                                <table class="table table-striped">
+                                    <a href="{% url 'signup' %}?username_authenticated_id={{ user.pk }}"><button type="button" class="btn btn-success"><span class="glyphicon glyphicon-plus-sign"></span> User Registration</button></a>
+                                    <p></p>
+                                    <tbody>
+                                        <tr>
+                                            <th><a href="{% url 'user_admin_table' %}?order_by_pk_id={{ order_by_pk_id }}&order_by_pk=1&username_authenticated_id={{ user.pk }}">ID</a></th>
+                                            <th id="title_admin_table"><a href="{% url 'user_admin_table' %}?order_by_username_id={{ order_by_username_id }}&order_by_username=1&username_authenticated_id={{ user.pk }}">Username</a></th>
+                                            <th><a href="{% url 'user_admin_table' %}?order_by_first_name_id={{ order_by_first_name_id }}&order_by_first_name=1&username_authenticated_id={{ user.pk }}">First name</a></th>
+                                            <th><a href="{% url 'user_admin_table' %}?order_by_last_name_id={{ order_by_last_name_id }}&order_by_last_name=1&username_authenticated_id={{ user.pk }}">Last name</a></th>
+                                            <th></th>
+                                            <th></th>
+                                        </tr>
+
+                                        {% for user_obj in user_objects %}
+                                            <tr>
+                                                <td>{{ user_obj.pk }}</td>
+                                                <td>{{ user_obj.username }}</td>
+                                                <td>{{ user_obj.first_name }}</td>
+                                                <td>{{ user_obj.last_name }}</td>
+                                                <!-- Update current user -->
+                                                <td><a href="{% url 'user_update' pk=user_obj.pk %}?username_authenticated_id={{ user.pk }}"><i class="material-icons" style="color:black">border_color</i></a></td>
+                                                <!-- Delete current user -->
+                                                <td><a href="{% url 'user_delete' pk=user_obj.pk admin_table_flag=1 %}?username_authenticated_id={{ user.pk }}"><i class="material-icons" style="color:red">delete_forever</i></a></td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- gallery-whole-content -->
+</section>
+
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'booking/base.html' %}
+{% load staticfiles %}
+{% load widget_tweaks %}
+
+{% block header %}
+    ACCESS CONTROL
+{% endblock %}
+
+{% block main_part %}
+
+<!-- <section>  --> <!-- This is located to base.html -->
+    <!-- <div class="gallery-whole-content"> --> <!-- This is located to base.html -->
+        <!-- MAIN CONTENT -->
+
+            <div class="gallery-main-content">
+                <div class="container-fluid">
+
+                    <div class="row">
+
+                        {% if user_access_objects %}
+
+                            <div class="col-xl-5">
+                            </div>
+
+                            <!-- Information -->
+                            <div class="col-xl">
+                                <table class="table table-striped">
+                                    <a href="{% url 'user_access_insert' %}?username_authenticated_id={{ user.pk }}">
+                                        <button type="button" class="btn btn-success">
+                                            <span class="glyphicon glyphicon-plus-sign"></span> Insert Access Rights
+                                        </button>
+                                    </a>
+                                    <p></p>
+                                    <tbody>
+                                        <tr>
+                                            <th><a href="{% url 'user_access_admin_table' %}?order_by_user_id={{ order_by_user_id }}&order_by_user=1&username_authenticated_id={{ user.pk }}">User
+                                                </a>
+                                            </th>
+                                            <th id="title_admin_table">
+                                                <a href="{% url 'user_access_admin_table' %}?order_by_access_id={{ order_by_access_id }}&order_by_access=1&username_authenticated_id={{ user.pk }}">Title
+                                                </a>
+                                            </th>
+                                            <th></th>
+                                            <th></th>
+                                        </tr>
+
+                                        {% for user_access_obj in user_access_objects %}
+                                            {% if user_access_obj.f_user.username == "admin" %}
+                                                <tr>
+                                                    <td>{{ user_access_obj.f_user }}</td>
+                                                    <td>{{ user_access_obj.f_access }}</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
+                                            {% else %}
+                                                <tr>
+                                                    <td>{{ user_access_obj.f_user }}</td>
+                                                    <td>{{ user_access_obj.f_access }}</td>
+                                                    <!-- Update current access rights -->
+                                                    <td><a href="{% url 'user_access_update' pk=user_access_obj.pk %}"><i class="material-icons" style="color:black">border_color</i></a></td>
+                                                    <!-- Delete current access rights -->
+                                                    <td><a href="{% url 'user_access_delete' pk=user_access_obj.pk admin_table_flag=1 %}"><i class="material-icons" style="color:red">delete_forever</i></a></td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+
+    </div> <!-- gallery-whole-content -->
+</section>
+
+{% endblock %}

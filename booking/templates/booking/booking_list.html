@@ -15,32 +15,63 @@
         <div class="gallery-main-content">
             <div class="container-fluid">
                 <div class="row">
-                    {% if booking_objects %}
-                        {% for booking_obj in booking_objects %}
-                            {% if booking_obj.photo %}
-                                <!-- col-md-4 - "gallery-style.css -->
+
+                    <div class="col-xl-3">
+                    </div>
+
+                    {% if rooms_distinct %}
+                        <!-- Information -->
+                        <div class="col-xl">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+
+                                        {% for room in rooms_distinct %}
+                                            <th>
+                                                <a href="{% url 'booking_detail' pk=room.pk %}?username_authenticated_id={{ user.pk }}&booking_flag=1">
+                                                    <span class="glyphicon glyphicon-calendar"></span> {{ room.title }}
+                                                </a>
+                                            </th>
+                                        {% endfor %}
+
+                                        <tr>
+                                        {% for key, value in booking_dict.items %}
+                                            <td>
+                                            {% for v in value %}
+                                                <pre><h5><span class="glyphicon glyphicon-calendar"></span> {{v.date_from}} - {{v.date_to}} ({{ v.f_user }})</h5></pre>
+                                            {% endfor %}
+                                            </td>
+                                        {% endfor %}
+                                        </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    <!--
+                        {% for room in rooms_distinct %}
+                            {% if room.photo %}
                                 <div class="col-md-4">
                                     <div class="thumbnail">
-                                        <a href="{% url 'booking_detail' pk=booking_obj.pk %}?username_authenticated_id={{ user.pk }}&booking_flag=1">
-                                            <img src="{{ booking_obj.photo.url }}" alt="{{ booking_obj.title }}">
+                                        <a href="{% url 'booking_detail' pk=room.pk %}?username_authenticated_id={{ user.pk }}&room_id={{ room.pk }}&booking_flag=1">
+                                            <img src="{{ room.photo.url }}" alt="{{ room.title }}">
                                             <div class="caption">
                                                 <p>
-                                                    {{ booking_obj.title }}
+                                                    {{ room.title }}
                                                 </p>
                                                 <p>
-                                                    {{ booking_obj.published_datetime|date:"d.m.Y" }}
+                                                    {{ booking_obj.date_from }} - {{ booking_obj.date_to }}
                                                     &nbsp;
                                                     &diams;
                                                     &nbsp;
-                                                    <span class="glyphicon glyphicon-eye-open"></span>
-                                                    {{ booking_obj.counter_popularity }}
-                                                 </p>
+                                                    {{ booking_obj.f_user }}
+                                                </p>
                                             </div>
                                         </a>
                                     </div>
                                  </div>
                             {% endif %}
                         {% endfor %}
+                    -->
                     {% else %}
                         <div class="col-xl-4">
                         </div>
@@ -64,6 +95,7 @@
 
 {% endblock %}
 
+<!--
 <script>
   $(function () {
     $("#datetimepicker1").datetimepicker({
@@ -71,3 +103,4 @@
     });
   });
 </script>
+-->
